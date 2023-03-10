@@ -9,7 +9,7 @@ const About = () => {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<div className="max-w-6xl mx-auto space-y-4">
+			<div className="max-w-6xl mx-auto space-y-4 p-4">
 				<h1 className="text-2xl font-medium text-amber-600">About Page</h1>
 				<p>
 					Welcome to our movie database website! We are a team of passionate
