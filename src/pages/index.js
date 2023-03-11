@@ -21,11 +21,12 @@ export default function Home() {
 							: genre === "fetchTrendingMovies"
 							? "trending/all/day"
 							: "trending/all/week"
-					}?api_key=${API_KEY}&language=en-US&page=1`
+					}?api_key=${API_KEY}&language=en-US&page=1`,
+					{ next: { revalidate: 3600 } }
 				);
 
 				if (!res.ok) {
-					throw new Error("Something went wrong!");
+					throw new Error("Failed to fetch data");
 				}
 
 				const data = await res.json();
@@ -35,7 +36,7 @@ export default function Home() {
 			}
 		};
 		fetchData();
-	}, [router]);
+	}, [router.query.genre]);
 
 	return (
 		<>

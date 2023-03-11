@@ -1,18 +1,12 @@
 import React from "react";
+import Card from "./Card";
 
 const results = ({ results }) => {
+	// console.log(results);
 	return (
-		<div>
+		<div className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 max-w-6xl mx-auto py-4">
 			{results.map((result) => (
-				<div key={result.id}>
-					<h1 className="text-2xl text-amber-600">
-						{result.original_title
-							? result.original_title
-							: result.original_name}
-					</h1>
-					<p> {result.overview} </p>
-					<br />
-				</div>
+				<Card key={result.id} result={result} />
 			))}
 		</div>
 	);
