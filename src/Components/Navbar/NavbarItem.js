@@ -15,7 +15,7 @@ const NavbarItem = ({ title, param }) => {
 					genre === param &&
 					"underline underline-offset-8 decoration-4 decoration-amber-500 rounded-lg"
 				}`}
-				href={`?genre=${param}`}>
+				href={`/?genre=${param}`}>
 				{title}
 			</Link>
 		</div>

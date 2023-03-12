@@ -1,8 +1,8 @@
 import React from "react";
 import Header from "../Header";
 import Navbar from "../Navbar";
-import Footer from "../Footer";
 import Providers from "@/pages/Providers";
+import Search from "../SearchBar";
 
 const Layout = ({ children }) => {
 	return (
@@ -10,8 +10,8 @@ const Layout = ({ children }) => {
 			<Providers>
 				<Header />
 				<Navbar />
+				<Search />
 				{children}
-				<Footer />
 			</Providers>
 		</div>
 	);

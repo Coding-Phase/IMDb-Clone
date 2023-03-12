@@ -1,18 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 
-const Error = ({ error, reset }) => {
+const Error = ({ error }) => {
 	useEffect(() => {
 		console.log(error);
 	}, [error]);
 
 	return (
 		<div className="text-center mt-10">
-			<h1>Something went wrong!</h1>
-			<button className="hover:text-amber-600" onClick={() => reset}>
-				Try again
-			</button>
+			<h1>Not Found!</h1>
+			<Link href="/" className="hover:text-amber-600">
+				Go to home
+			</Link>
 		</div>
 	);
 };
