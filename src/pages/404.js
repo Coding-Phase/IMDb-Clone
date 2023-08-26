@@ -9,9 +9,9 @@ const Error = ({ error }) => {
 	}, [error]);
 
 	return (
-		<div className="text-center mt-10">
-			<h1>Not Found!</h1>
-			<Link href="/" className="hover:text-amber-600">
+		<div className="text-center mt-10 flex flex-col gap-4">
+			<h1 className="truncate text-lg font-bold text-amber-600">Not Found!</h1>
+			<Link href="/" className="hover:text-amber-600 ">
 				Go to home
 			</Link>
 		</div>
