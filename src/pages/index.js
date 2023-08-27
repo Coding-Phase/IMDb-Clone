@@ -1,60 +1,71 @@
 import Head from "next/head";
 import Results from "@/Components/Results";
 import Pagination from "@/Components/Pagination";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/router";
+import debounce from "lodash/debounce";
 
 export default function Home({ results, totalPages }) {
 	const router = useRouter();
-	const [page, setPage] = useState(1);
+	const scrollToTop = useRef(null);
+	const searchParams = new URLSearchParams(router.query);
 
+	const genre = searchParams.get("genre");
+
+	const [page, setPage] = useState(1);
 	const [fetchedResults, setFetchedResults] = useState(results);
 
+	const debouncedScroll = useMemo(
+		() =>
+			debounce(() => {
+				if (scrollToTop.current) {
+					window.scrollTo({
+						top: scrollToTop.current.offsetTop,
+						left: 0,
+						behavior: "smooth",
+					});
+				}
+			}, 300),
+		[]
+	);
+
 	useEffect(() => {
-		window.scrollTo(0, 0);
+		debouncedScroll();
 		router.push({
 			pathname: "/",
-			query: { genre: router.query.genre, page: page },
+			query: {
+				genre: router.query.genre ? router.query.genre : "fetchTrending",
+				page: page,
+			},
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [page]);
 
-		// async function fetchData() {
-		// 	const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-		// 	const genre = "fetchTrending";
-		// 	try {
-		// 		const res = await fetch(
-		// 			`https://api.themoviedb.org/3/${
-		// 				genre === "fetchTopRatedMovies"
-		// 					? "movie/top_rated"
-		// 					: genre === "fetchTrendingMovies"
-		// 					? "trending/all/day"
-		// 					: "trending/all/week"
-		// 			}?api_key=${API_KEY}&language=en-US&page=${page}`,
-		// 			{
-		// 				method: "GET", // Specify the HTTP method
-		// 				headers: {
-		// 					Accept: "application/json",
-		// 					// Add any other headers here if needed
-		// 				},
-		// 			}
-		// 		);
+	useEffect(() => {
+		async function fetchData() {
+			const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+			try {
+				const res = await fetch(
+					`https://api.themoviedb.org/3/${genreMap[genre]}?api_key=${API_KEY}&language=en-US&page=${page}`
+				);
 
-		// 		if (!res.ok) {
-		// 			throw new Error("Network response was not ok");
-		// 		}
+				if (!res.ok) {
+					throw new Error("Network response was not ok");
+				}
 
-		// 		const data = await res.json();
-		// 		setFetchedResults(data.results);
-		// 	} catch (error) {
-		// 		console.log(error);
-		// 	}
-		// }
+				const data = await res.json();
+				setFetchedResults(data.results);
+			} catch (error) {
+				console.error(error);
+			}
+		}
 
-		// fetchData();
-	}, [page, router.query.genre]);
+		fetchData();
+	}, [genre, page]);
 
 	useEffect(() => {
 		setPage(1);
-	}, [router.query.genre]);
+	}, [genre]);
 
 	return (
 		<>
@@ -64,11 +75,11 @@ export default function Home({ results, totalPages }) {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<main>
+			<main ref={scrollToTop}>
 				<Results results={fetchedResults} />
 				<Pagination
 					totalPages={totalPages}
-					pages={page}
+					currentPage={page}
 					paginate={(value) => setPage(value)}
 				/>
 			</main>
@@ -76,21 +87,19 @@ export default function Home({ results, totalPages }) {
 	);
 }
 
+const genreMap = {
+	fetchTopRatedMovies: "movie/top_rated",
+	fetchTrendingMovies: "trending/all/day",
+	fetchTrending: "trending/all/week",
+};
+
 export async function getServerSideProps(context) {
 	const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-	const query = context?.query;
-
-	const { genre = "fetchTrending", page = 1 } = query;
+	const { genre = "fetchTrending", page = 1 } = context.query;
 
 	try {
 		const res = await fetch(
-			`https://api.themoviedb.org/3/${
-				genre === "fetchTopRatedMovies"
-					? "movie/top_rated"
-					: genre === "fetchTrendingMovies"
-					? "trending/all/day"
-					: "trending/all/week"
-			}?api_key=${API_KEY}&language=en-US&page=${page}`,
+			`https://api.themoviedb.org/3/${genreMap[genre]}?api_key=${API_KEY}&language=en-US&page=${page}`,
 			{
 				next: {
 					revalidate: 3600,
